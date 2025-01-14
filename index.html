@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Binary String 2 Square Waveform</title>
+    <style>
+        body {
+            background-color: rgba(14, 13, 13, 0.67);
+            font-family: 'Courier New', monospace;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+            color: rgb(0, 190, 0);
+        }
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 20px auto;
+            width: 90%; /* Make canvas responsive */
+            max-width: 800px; /* Limit max width for larger screens */
+            height: auto; /* Maintain aspect ratio */
+            background-color: white;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+    <h1>Binary String to Square Waveform</h1>
+    <input type="text" id="binaryInput" placeholder="Enter binary string" value="1010">
+    <button onclick="drawWaveform()">Convert to Waveform</button>
+    <canvas id="waveformCanvas"></canvas>
+
+    <script>
+        function drawWaveform() {
+            const binaryInput = document.getElementById('binaryInput').value;
+            const canvas = document.getElementById('waveformCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas dimensions based on the parent container's width
+            canvas.width = canvas.clientWidth;
+            canvas.height = 400;
+
+            const width = canvas.width;
+            const height = canvas.height;
+            const stepX = width / binaryInput.length;
+            const highY = height / 4;  // Y-coordinate for '1'
+            const lowY = (3 * height) / 4;  // Y-coordinate for '0'
+            const textOffset = 20; // Offset for displaying text above the wave
+
+            // Clear the canvas
+            ctx.fillStyle = 'white'; // Set background color to white
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.strokeStyle = 'black'; // Line color
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            let currentY = binaryInput[0] === '1' ? highY : lowY;
+            ctx.moveTo(0, currentY);
+
+            for (let i = 0; i < binaryInput.length; i++) {
+                const nextX = (i + 1) * stepX;
+                const nextY = binaryInput[i] === '1' ? highY : lowY;
+
+                // Draw vertical line for change in state
+                if (i > 0 && binaryInput[i] !== binaryInput[i - 1]) {
+                    ctx.lineTo(nextX - stepX, currentY); // Horizontal line
+                    ctx.lineTo(nextX - stepX, nextY); // Vertical transition
+                }
+
+                // Continue with horizontal line
+                ctx.lineTo(nextX, nextY);
+
+                // Draw the binary digit above the pulse
+                ctx.fillStyle = 'black';
+                ctx.font = '16px Arial';
+                ctx.textAlign = 'center';
+                const textY = nextY === highY ? highY - textOffset : lowY - textOffset;
+                ctx.fillText(binaryInput[i], nextX - stepX / 2, textY);
+
+                currentY = nextY;
+            }
+
+            ctx.stroke();
+        }
+
+        // Redraw the waveform when the window is resized
+        window.addEventListener('resize', drawWaveform);
+    </script>
+</body>
+</html>
